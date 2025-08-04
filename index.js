@@ -17,6 +17,10 @@ const checklistFile = path.join(__dirname, "checklist.json");
 const logFile = path.join(__dirname, "log.txt");
 const notesFile = path.join(__dirname, "notes.json");
 
+const express = require("express");
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 bot.setMyCommands([
   { command: "start", description: "Activate the bot" },
   { command: "status", description: "Show checklist & budget status" },
@@ -206,4 +210,10 @@ bot.onText(/\/setbudget (\d+)/, (msg, match) => {
     msg.chat.id,
     `✅ Saved budget updated to $${checklist.savedBudget.toLocaleString()}`
   );
+});
+
+app.get("/", (req, res) => res.send("FinalissimaGoalBot is running..."));
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
