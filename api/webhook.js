@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const token = process.env.BOT_TOKEN;
-const bot = new TelegramBot(token);
+const bot = new TelegramBot(token, { webHook: { port: 443 } }); // Explicit webhook mode
 
 const checklistFile = path.join(__dirname, "../../checklist.json");
 const logFile = path.join(__dirname, "../../log.txt");
@@ -165,11 +165,16 @@ bot.onText(/\/setbudget (\d+)/, (msg, match) => {
   );
 });
 
-// ─── Webhook Handler ───────────────────────────────────────
+// ─── Webhook Handler for Vercel/Express ─────────────────────
 module.exports = async (req, res) => {
   if (req.method === "POST") {
-    await bot.processUpdate(req.body);
-    res.status(200).send("OK");
+    try {
+      await bot.processUpdate(req.body);
+      res.status(200).send("OK");
+    } catch (error) {
+      console.error("Error processing update:", error);
+      res.status(500).send("Error");
+    }
   } else {
     res.status(200).send("FinalissimaGoalBot Webhook Running...");
   }
